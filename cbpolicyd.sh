@@ -25,6 +25,7 @@ set -e
 # Thanks 
 
 MYSQL_CLI="/usr/bin/mysql"
+MYSQL_PORT="3306"
 
 echo "Automated cbpolicd installer for single-server. Tested on Zimbra 8.8.15 p7 CentOS7, Zimbra 9.0.0 p29 CentOS 7, Zimbra 9.0.0 patch 29 on Ubuntu 20, Zimbra 10 on Ubuntu 20.
 - Installs policyd on MariaDB or MySQL (shipped with Zimbra) and show commands on how to activate on Zimbra
@@ -96,7 +97,7 @@ echo "Setting password in /opt/zimbra/conf/cbpolicyd.conf.in"
 grep -lZr -e ".*assword=.*$" "/opt/zimbra/conf/cbpolicyd.conf.in"  | xargs -0 sed -i "s^.*assword=.*$^Password=${CBPOLICYD_PWD}^g"
 
 echo "Setting database in /opt/zimbra/conf/cbpolicyd.conf.in"
-grep -lZr -e "DSN=.*$" "/opt/zimbra/conf/cbpolicyd.conf.in"  | xargs -0 sed -i "s^DSN=.*$^DSN=DBI:mysql:database=policyd_db;host=127.0.0.1;port=7306^g"
+grep -lZr -e "DSN=.*$" "/opt/zimbra/conf/cbpolicyd.conf.in"  | xargs -0 sed -i "s^DSN=.*$^DSN=DBI:mysql:database=policyd_db;host=127.0.0.1;port=${MYSQL_PORT}^g"
 
 POLICYDPOLICYSQL="$(mktemp /tmp/policyd-policy.XXXXXXXX.sql)"
 cat <<EOF > "${POLICYDPOLICYSQL}"
