@@ -24,6 +24,8 @@ set -e
 # https://wiki.zimbra.com/wiki/Postfix_Policyd#Example_Configuration
 # Thanks 
 
+MYSQL_CLI="/usr/bin/mysql"
+
 echo "Automated cbpolicd installer for single-server. Tested on Zimbra 8.8.15 p7 CentOS7, Zimbra 9.0.0 p29 CentOS 7, Zimbra 9.0.0 patch 29 on Ubuntu 20, Zimbra 10 on Ubuntu 20.
 - Installs policyd on MariaDB or MySQL (shipped with Zimbra) and show commands on how to activate on Zimbra
 - No webui is installed"
@@ -45,7 +47,7 @@ GRANT ALL PRIVILEGES ON policyd_db . * TO 'ad-policyd_db'@'localhost' WITH GRANT
 FLUSH PRIVILEGES ; 
 EOF
 
-/opt/zimbra/bin/mysql --force < "${POLICYDDBCREATE}" > /dev/null 2>&1
+"${MYSQL_CLI}" --force < "${POLICYDDBCREATE}" > /dev/null 2>&1
 
 cat <<EOF > "${POLICYDDBCREATE}"
 DROP USER 'ad-policyd_db'@'localhost';
@@ -57,7 +59,7 @@ FLUSH PRIVILEGES ;
 EOF
 
 echo "Creating database and user"
-/opt/zimbra/bin/mysql < "${POLICYDDBCREATE}"
+"${MYSQL_CLI}" < "${POLICYDDBCREATE}"
 
 if [ -d "/opt/zimbra/common/share/database/" ]; then
    #shipped version from Zimbra (8.7)
@@ -80,7 +82,7 @@ if grep --quiet -e "TYPE=InnoDB" "${POLICYDTABLESSQL}"; then
 fi
 
 echo "Populating policyd_db please wait..."
-/opt/zimbra/bin/mysql policyd_db < "${POLICYDTABLESSQL}"
+"${MYSQL_CLI}" policyd_db < "${POLICYDTABLESSQL}"
 
 
 CBPOLICYDCONF="$(mktemp /tmp/cbpolicyd.conf.in.XXXXXXXX)"
@@ -108,10 +110,10 @@ EOF
 
 echo "Setting basic quota policy"
 
-/opt/zimbra/bin/mysql policyd_db < "${POLICYDPOLICYSQL}"
+"${MYSQL_CLI}" policyd_db < "${POLICYDPOLICYSQL}"
 
 echo "Installing reporting commands"
-echo "/opt/zimbra/bin/mysql policyd_db -e \"select count(instance) count, sender from session_tracking where date(from_unixtime(unixtimestamp))=curdate() group by sender order by count desc;\"" > /usr/local/sbin/cbpolicyd-report
+echo ""${MYSQL_CLI}" policyd_db -e \"select count(instance) count, sender from session_tracking where date(from_unixtime(unixtimestamp))=curdate() group by sender order by count desc;\"" > /usr/local/sbin/cbpolicyd-report
 chmod +rx /usr/local/sbin/cbpolicyd-report
 
 echo "Setting up cron"
@@ -153,7 +155,7 @@ Here are some tips:
 - On Zimbra patches and upgrades, you may need to re-run
   this script or re-apply the configuration  
 - You can change or review your polcies using mysql client:
-  /opt/zimbra/bin/mysql policyd_db
+  "${MYSQL_CLI}" policyd_db
   SELECT * FROM quotas_limits;
   UPDATE quotas_limits SET CounterLimit = 30 WHERE ID = 4;
 
