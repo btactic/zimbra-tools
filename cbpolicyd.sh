@@ -150,6 +150,15 @@ if [ "x${SERVER_MODE}" = "xYES" ] && [ "x${CLIENT_MODE}" = "xYES" ] ; then
   exit 1
 fi
 
+# We need either server mode or cliente mode
+if [ "x${SERVER_MODE}" = "xYES" ] || [ "x${CLIENT_MODE}" = "xYES" ] ; then
+  :
+else
+  echo "Either --client or --server needs to be specified."
+  echo "Aborting..."
+  exit 1
+fi
+
 # If hostname is empty at this point and we are in server mode we override it with the default value
 if [ "x${SERVER_MODE}" = "xYES" ] && [ "x" = "x${CBPOLICYD_DB_HOSTNAME}" ] ; then
   CBPOLICYD_DB_HOSTNAME="${DEFAULT_CBPOLICYD_DB_HOSTNAME}"
