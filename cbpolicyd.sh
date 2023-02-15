@@ -61,7 +61,7 @@ fi
 # DEFAULT VALUES
 
 CBPOLICYD_DB_USER="ad-policyd_db"
-CBPOLICYD_DB_HOSTNAME="127.0.0.1"
+DEFAULT_CBPOLICYD_DB_HOSTNAME="127.0.0.1"
 CBPOLICYD_DB_NAME="policyd_db"
 CBPOLICYD_DB_PORT="3306"
 CBPOLICYD_DB_USER_ALLOWED_HOST='*'
@@ -70,10 +70,6 @@ CBPOLICYD_SENDER_PERIOD="60"
 CBPOLICYD_SENDER_MESSAGECOUNT="100"
 CBPOLICYD_RECIPIENT_PERIOD="60"
 CBPOLICYD_RECIPIENT_MESSAGECOUNT="125"
-
-if [ "x${CLIENT_MODE}" = "xYES" ] ; then
-  CBPOLICYD_DB_HOSTNAME=""
-fi
 
 # Check the arguments.
 for option in "$@"; do
@@ -97,20 +93,40 @@ for option in "$@"; do
   esac
 done
 
-# Check if server mode and client mode were asked at the same time
-if [ "x${SERVER_MODE}" = "xYES" ] && [ "x${SERVER_MODE}" = "xYES" ] ; then
+# Check if server mode and client mode were requested at the same time
+if [ "x${SERVER_MODE}" = "xYES" ] && [ "x${CLIENT_MODE}" = "xYES" ] ; then
   echo "--client and --server cannot be used simultaneously."
   echo "Aborting..."
   exit 1
 fi
 
-# TODO: If in CLIENT_MODE then CBPOLICYD_DB_HOSTNAME and CBPOLICYD_DB_PASSWORD are compulsory.
+# If hostname is empty at this point and we are in server mode we override it with the default value
+if [ "x${SERVER_MODE}" = "xYES" ] && [ "x" = "x${CBPOLICYD_DB_HOSTNAME}" ] ; then
+  CBPOLICYD_DB_HOSTNAME="${DEFAULT_CBPOLICYD_DB_HOSTNAME}"
+fi
+
+# If password is empty at this point and we are in server mode we generate a random value
+if [ "x${SERVER_MODE}" = "xYES" ] && [ "x" = "x${CBPOLICYD_DB_PASSWORD}" ] ; then
+  CBPOLICYD_DB_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-10};echo;)
+fi
+
+# Ensure that Client mode has a hostname
+if [ "x${CLIENT_MODE}" = "xYES" ] && [ "x" = "x${CBPOLICYD_DB_HOSTNAME}" ] ; then
+  echo "--client needs a non empty --hostname"
+  echo "Aborting..."
+  exit 1
+fi
+
+# Ensure that Client mode has a password
+if [ "x${CLIENT_MODE}" = "xYES" ] && [ "x" = "x${CBPOLICYD_DB_PASSWORD}" ] ; then
+  echo "--client needs a non empty --password"
+  echo "Aborting..."
+  exit 1
+fi
 
 # TODO: Check that at this point all of the variables have some kind of data
 
 if [ "x${SERVER_MODE}" = "xYES" ] ; then
-
-  CBPOLICYD_DB_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-10};echo;)
 
   # creating a user, just to make sure we have one (for mysql on CentOS 6, so we can execute the next mysql queries w/o errors)
   POLICYDDBCREATE="$(mktemp /tmp/policyd-dbcreate.XXXXXXXX.sql)"
