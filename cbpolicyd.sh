@@ -118,20 +118,6 @@ echo "Installing reporting commands"
 echo ""${MYSQL_CLI}" policyd_db -e \"select count(instance) count, sender from session_tracking where date(from_unixtime(unixtimestamp))=curdate() group by sender order by count desc;\"" > /usr/local/sbin/cbpolicyd-report
 chmod +rx /usr/local/sbin/cbpolicyd-report
 
-echo "Setting up cron"
-
-if [[ -x "/opt/zimbra/common/bin/cbpadmin" ]]
-then
-   #8.7
-    echo "35 3 * * * zimbra bash -l -c '/opt/zimbra/common/bin/cbpadmin --config=/opt/zimbra/conf/cbpolicyd.conf --cleanup' >/dev/null" > /etc/cron.d/cbpolicyd-cleanup
-elif  [[ -x "/opt/zimbra/cbpolicyd/bin/cbpadmin" ]]
-then
-    #8.6
-    echo "35 3 * * * zimbra bash -l -c '/opt/zimbra/cbpolicyd/bin/cbpadmin --config=/opt/zimbra/conf/cbpolicyd.conf --cleanup' >/dev/null" > /etc/cron.d/cbpolicyd-cleanup
-else
-    echo "cbpadmin is not found in /opt/zimbra"
-fi
-
 echo "--------------------------------------------------------------------------------------------------------------
 CBPolicyd installed successful, the following policy is installed:
 - Rate limit any sender from sending more then 100 emails every 60 seconds. Messages beyond this limit are deferred.
@@ -148,8 +134,8 @@ For your reference:
   ${CBPOLICYDCONF}   
 - Running config is in:
   /opt/zimbra/conf/cbpolicyd.conf.in
-- Database clean-up is scheduled daily at 03:35AM using:
-  /etc/cron.d/cbpolicyd-cleanup
+- Database clean-up is scheduled daily at 03:35AM using
+  the default zimbra cron
 
 Here are some tips:
 - You can run /usr/local/sbin/cbpolicyd-report 
