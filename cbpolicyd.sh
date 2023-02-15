@@ -27,6 +27,7 @@ set -e
 MYSQL_CLI="/usr/bin/mysql"
 TOO_MANY_EMAILS_MESSAGE="Esta mandando demasiados mensajes en muy poco tiempo. Pruebe mas tarde."
 SERVER_MODE="YES"
+CLIENT_MODE="NO"
 
 echo "Automated cbpolicd installer for single-server. Tested on Zimbra 8.8.15 p7 CentOS7, Zimbra 9.0.0 p29 CentOS 7, Zimbra 9.0.0 patch 29 on Ubuntu 20, Zimbra 10 on Ubuntu 20.
 - Installs policyd on MariaDB or MySQL (shipped with Zimbra) and show commands on how to activate on Zimbra
@@ -38,18 +39,29 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# If in CLIENT_MODE then CBPOLICYD_DB_HOSTNAME and CBPOLICYD_DB_PASSWORD are compulsory.
+# If in SERVER_MODE then nothing is compulsory but you can override if you want to.
+
+# DEFAULT VALUES
+
+CBPOLICYD_DB_USER="ad-policyd_db"
+CBPOLICYD_DB_HOSTNAME="127.0.0.1"
+CBPOLICYD_DB_NAME="policyd_db"
+CBPOLICYD_DB_PORT="3306"
+CBPOLICYD_DB_USER_ALLOWED_HOST='*'
+
+CBPOLICYD_SENDER_PERIOD="60"
+CBPOLICYD_SENDER_MESSAGECOUNT="100"
+CBPOLICYD_RECIPIENT_PERIOD="60"
+CBPOLICYD_RECIPIENT_MESSAGECOUNT="125"
+
+if [ "x${CLIENT_MODE}" = "xYES" ] ; then
+  CBPOLICYD_DB_HOSTNAME=""
+fi
+
+# TODO: Parse arguments
+
 if [ "x${SERVER_MODE}" = "xYES" ] ; then
-
-  CBPOLICYD_DB_USER="ad-policyd_db"
-  CBPOLICYD_DB_HOSTNAME="127.0.0.1"
-  CBPOLICYD_DB_NAME="policyd_db"
-  CBPOLICYD_DB_PORT="3306"
-  CBPOLICYD_DB_USER_ALLOWED_HOST='*'
-
-  CBPOLICYD_SENDER_PERIOD="60"
-  CBPOLICYD_SENDER_MESSAGECOUNT="100"
-  CBPOLICYD_RECIPIENT_PERIOD="60"
-  CBPOLICYD_RECIPIENT_MESSAGECOUNT="125"
 
   CBPOLICYD_DB_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-10};echo;)
 
@@ -116,16 +128,6 @@ EOF
   echo "Installing reporting commands"
   echo ""${MYSQL_CLI}" ${CBPOLICYD_DB_NAME} -e \"select count(instance) count, sender from session_tracking where date(from_unixtime(unixtimestamp))=curdate() group by sender order by count desc;\"" > /usr/local/sbin/cbpolicyd-report
   chmod +rx /usr/local/sbin/cbpolicyd-report
-
-else # CLIENT MODE
-
-  # TODO: Handle different client options
-
-  CBPOLICYD_DB_USER=""
-  CBPOLICYD_DB_PASSWORD=""
-  CBPOLICYD_DB_HOSTNAME=""
-  CBPOLICYD_DB_NAME=""
-  CBPOLICYD_DB_PORT=""
 
 fi
 
