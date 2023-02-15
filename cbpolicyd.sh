@@ -78,11 +78,29 @@ for option in "$@"; do
       usage
       exit 0
     ;;
+    --user=*)
+      CBPOLICYD_DB_USER=`echo "$option" | sed 's/--user=//'`
+    ;;
     --hostname=*)
       CBPOLICYD_DB_HOSTNAME=`echo "$option" | sed 's/--hostname=//'`
     ;;
+    --port=*)
+      CBPOLICYD_DB_PORT=`echo "$option" | sed 's/--port=//'`
+    ;;
     --password=*)
       CBPOLICYD_DB_PASSWORD=`echo "$option" | sed 's/--password=//'`
+    ;;
+    --sender-period=*)
+      CBPOLICYD_SENDER_PERIOD=`echo "$option" | sed 's/--sender-period=//'`
+    ;;
+    --sender-messagecount=*)
+      CBPOLICYD_SENDER_MESSAGECOUNT=`echo "$option" | sed 's/--sender-messagecount=//'`
+    ;;
+    --recipient-period=*)
+      CBPOLICYD_RECIPIENT_PERIOD=`echo "$option" | sed 's/--recipient-period=//'`
+    ;;
+    --recipient-messagecount=*)
+      CBPOLICYD_RECIPIENT_MESSAGECOUNT=`echo "$option" | sed 's/--recipient-messagecount=//'`
     ;;
     --client)
       CLIENT_MODE="YES"
