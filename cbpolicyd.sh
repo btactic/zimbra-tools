@@ -24,9 +24,26 @@ set -e
 # https://wiki.zimbra.com/wiki/Postfix_Policyd#Example_Configuration
 # Thanks 
 
+usage() {
+cat <<EOF
+  Copyright (C) 2023 BTACTIC, SCCL
+  Copyright (C) 2016-2023  Barry de Graaff
+  Licensed under the GNU PUBLIC LICENSE 3.0
+
+  SERVER MODE
+  ===========
+  Usage: $0 --server
+  Server mode use default parametres to setup itself.
+
+  CLIENT MODE
+  ===========
+  Usage: $0 --client --hostname=HOSTNAME --password=PASSWORD
+  Example: $0 --client --hostname=192.168.1.100 --password=MYS3CR3T
+EOF
+
 MYSQL_CLI="/usr/bin/mysql"
 TOO_MANY_EMAILS_MESSAGE="Esta mandando demasiados mensajes en muy poco tiempo. Pruebe mas tarde."
-SERVER_MODE="YES"
+SERVER_MODE="NO"
 CLIENT_MODE="NO"
 
 echo "Automated cbpolicd installer for single-server. Tested on Zimbra 8.8.15 p7 CentOS7, Zimbra 9.0.0 p29 CentOS 7, Zimbra 9.0.0 patch 29 on Ubuntu 20, Zimbra 10 on Ubuntu 20.
@@ -39,7 +56,6 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-# If in CLIENT_MODE then CBPOLICYD_DB_HOSTNAME and CBPOLICYD_DB_PASSWORD are compulsory.
 # If in SERVER_MODE then nothing is compulsory but you can override if you want to.
 
 # DEFAULT VALUES
@@ -59,7 +75,38 @@ if [ "x${CLIENT_MODE}" = "xYES" ] ; then
   CBPOLICYD_DB_HOSTNAME=""
 fi
 
-# TODO: Parse arguments
+# Check the arguments.
+for option in "$@"; do
+  case "$option" in
+    -h | --help)
+      usage
+      exit 0
+    ;;
+    --hostname=*)
+      CBPOLICYD_DB_HOSTNAME=`echo "$option" | sed 's/--hostname=//'`
+    ;;
+    --password=*)
+      CBPOLICYD_DB_PASSWORD=`echo "$option" | sed 's/--password=//'`
+    ;;
+    --client)
+      CLIENT_MODE="YES"
+    ;;
+    --server)
+      SERVER_MODE="YES"
+    ;;
+  esac
+done
+
+# Check if server mode and client mode were asked at the same time
+if [ "x${SERVER_MODE}" = "xYES" ] && [ "x${SERVER_MODE}" = "xYES" ] ; then
+  echo "--client and --server cannot be used simultaneously."
+  echo "Aborting..."
+  exit 1
+fi
+
+# TODO: If in CLIENT_MODE then CBPOLICYD_DB_HOSTNAME and CBPOLICYD_DB_PASSWORD are compulsory.
+
+# TODO: Check that at this point all of the variables have some kind of data
 
 if [ "x${SERVER_MODE}" = "xYES" ] ; then
 
