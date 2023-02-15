@@ -24,6 +24,19 @@ set -e
 # https://wiki.zimbra.com/wiki/Postfix_Policyd#Example_Configuration
 # Thanks 
 
+# DEFAULT VALUES
+
+CBPOLICYD_DB_USER="ad-policyd_db"
+DEFAULT_CBPOLICYD_DB_HOSTNAME="127.0.0.1"
+CBPOLICYD_DB_NAME="policyd_db"
+CBPOLICYD_DB_PORT="3306"
+CBPOLICYD_DB_USER_ALLOWED_HOST='*'
+
+CBPOLICYD_SENDER_PERIOD="60"
+CBPOLICYD_SENDER_MESSAGECOUNT="100"
+CBPOLICYD_RECIPIENT_PERIOD="60"
+CBPOLICYD_RECIPIENT_MESSAGECOUNT="125"
+
 usage() {
 cat <<EOF
   Copyright (C) 2023 BTACTIC, SCCL
@@ -39,12 +52,42 @@ cat <<EOF
   ===========
   Usage: $0 --client --hostname=HOSTNAME --password=PASSWORD
   Example: $0 --client --hostname=192.168.1.100 --password=MYS3CR3T
+  You need to specify both hostname and password in client mode.
+
+  COMMON OPTIONS
+  ==============
+    --user=USERNAME
+    CBPolicyd DB Username. Default: ${CBPOLICYD_DB_USER}
+
+    --hostname=HOSTNAME
+    CBPolicyd DB Hostname. Default (for server mode only): ${DEFAULT_CBPOLICYD_DB_HOSTNAME}
+
+    --port=PORT
+    CBPolicyd DB Port. Default: ${CBPOLICYD_DB_PORT}
+
+    --password=PASSWORD
+    CBPolicyd DB Password
+
+    --sender-period=SENDER_PERIOD
+    CBPolicyd Sender Period to use as a base to limit.
+    Default: ${CBPOLICYD_SENDER_PERIOD}
+
+    --sender-messagecount=SENDER_MESSAGECOUNT
+    CBPolicyd Sender Messagecount to use as a base to limit.
+    Default: ${CBPOLICYD_SENDER_MESSAGECOUNT}
+
+    --recipient-period=RECIPIENT_PERIOD
+    CBPolicyd Recipient Period to use as a base to limit.
+    Default: ${CBPOLICYD_RECIPIENT_PERIOD}
+
+    --recipient-messagecount=RECIPIENT_MESSAGECOUNT
+    CBPolicyd Recipient Messagecount to use as a base to limit.
+    Default: ${CBPOLICYD_RECIPIENT_MESSAGECOUNT}
+
 EOF
 
 MYSQL_CLI="/usr/bin/mysql"
 TOO_MANY_EMAILS_MESSAGE="Esta mandando demasiados mensajes en muy poco tiempo. Pruebe mas tarde."
-SERVER_MODE="NO"
-CLIENT_MODE="NO"
 
 echo "Automated cbpolicd installer for single-server. Tested on Zimbra 8.8.15 p7 CentOS7, Zimbra 9.0.0 p29 CentOS 7, Zimbra 9.0.0 patch 29 on Ubuntu 20, Zimbra 10 on Ubuntu 20.
 - Installs policyd on MariaDB or MySQL (shipped with Zimbra) and show commands on how to activate on Zimbra
@@ -56,20 +99,9 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-# If in SERVER_MODE then nothing is compulsory but you can override if you want to.
-
-# DEFAULT VALUES
-
-CBPOLICYD_DB_USER="ad-policyd_db"
-DEFAULT_CBPOLICYD_DB_HOSTNAME="127.0.0.1"
-CBPOLICYD_DB_NAME="policyd_db"
-CBPOLICYD_DB_PORT="3306"
-CBPOLICYD_DB_USER_ALLOWED_HOST='*'
-
-CBPOLICYD_SENDER_PERIOD="60"
-CBPOLICYD_SENDER_MESSAGECOUNT="100"
-CBPOLICYD_RECIPIENT_PERIOD="60"
-CBPOLICYD_RECIPIENT_MESSAGECOUNT="125"
+# By default no server mode or client mode is requested.
+SERVER_MODE="NO"
+CLIENT_MODE="NO"
 
 # Check the arguments.
 for option in "$@"; do
