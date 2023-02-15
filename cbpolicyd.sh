@@ -140,7 +140,12 @@ echo "Setting database in /opt/zimbra/conf/cbpolicyd.conf.in"
 grep -lZr -e "DSN=.*$" "/opt/zimbra/conf/cbpolicyd.conf.in"  | xargs -0 sed -i "s^DSN=.*$^DSN=DBI:mysql:database=${CBPOLICYD_DB_NAME};host=${CBPOLICYD_DB_HOSTNAME};port=${CBPOLICYD_DB_PORT}^g"
 
 echo "--------------------------------------------------------------------------------------------------------------
-CBPolicyd installed successful, the following policy is installed:
+CBPolicyd installed successful
+"
+
+if [ "x${SERVER_MODE}" = "xYES" ] ; then
+  echo "--------------------------------------------------------------------------------------------------------------
+The following policy is installed:
 - Rate limit any sender from sending more then 100 emails every 60 seconds. Messages beyond this limit are deferred.
 - Rate limit any @domain from receiving more then 125 emails in a 60 second period. Messages beyond this rate are rejected.
 
@@ -151,6 +156,20 @@ For your reference:
   ${POLICYDTABLESSQL}
 - The quota/rate limiting policy has been created using:
   ${POLICYDPOLICYSQL}
+
+Here are some tips:
+- You can run /usr/local/sbin/cbpolicyd-report
+  to show message count by sender/day
+- You can change or review your polcies using mysql client:
+  "${MYSQL_CLI}" ${CBPOLICYD_DB_NAME}
+  SELECT * FROM quotas_limits;
+  UPDATE quotas_limits SET CounterLimit = 30 WHERE ID = 4;
+
+--------------------------------------------------------------------------------------------------------------
+"
+fi
+
+echo "--------------------------------------------------------------------------------------------------------------
 - A configuration backup is in:
   ${CBPOLICYDCONF}   
 - Running config is in:
@@ -159,14 +178,8 @@ For your reference:
   the default zimbra cron
 
 Here are some tips:
-- You can run /usr/local/sbin/cbpolicyd-report 
-  to show message count by sender/day 
 - On Zimbra patches and upgrades, you may need to re-run
   this script or re-apply the configuration  
-- You can change or review your polcies using mysql client:
-  "${MYSQL_CLI}" ${CBPOLICYD_DB_NAME}
-  SELECT * FROM quotas_limits;
-  UPDATE quotas_limits SET CounterLimit = 30 WHERE ID = 4;
 
 To activate your configuration, run as zimbra user:
 zmprov ms \$(zmhostname) +zimbraServiceEnabled cbpolicyd
