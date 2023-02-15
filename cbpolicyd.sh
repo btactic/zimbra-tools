@@ -46,6 +46,11 @@ if [ "x${SERVER_MODE}" = "xYES" ] ; then
   CBPOLICYD_DB_PORT="3306"
   CBPOLICYD_DB_USER_ALLOWED_HOST='*'
 
+  CBPOLICYD_SENDER_PERIOD="60"
+  CBPOLICYD_SENDER_MESSAGECOUNT="100"
+  CBPOLICYD_RECIPIENT_PERIOD="60"
+  CBPOLICYD_RECIPIENT_MESSAGECOUNT="125"
+
   CBPOLICYD_DB_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-10};echo;)
 
   # creating a user, just to make sure we have one (for mysql on CentOS 6, so we can execute the next mysql queries w/o errors)
@@ -98,10 +103,10 @@ EOF
   cat <<EOF > "${POLICYDPOLICYSQL}"
   INSERT INTO policies (ID, Name,Priority,Description) VALUES(6, 'Zimbra CBPolicyd Policies', 0, 'Zimbra CBPolicyd Policies');
   INSERT INTO policy_members (PolicyID,Source,Destination) VALUES(6, 'any', 'any');
-  INSERT INTO quotas (PolicyID,Name,Track,Period,Verdict,Data) VALUES (6, 'Sender:user@domain','Sender:user@domain', 60, 'DEFER', '${TOO_MANY_EMAILS_MESSAGE}');
-  INSERT INTO quotas (PolicyID,Name,Track,Period,Verdict) VALUES (6, 'Recipient:user@domain', 'Recipient:user@domain', 60, 'REJECT');
-  INSERT INTO quotas_limits (QuotasID,Type,CounterLimit) VALUES(3, 'MessageCount', 100);
-  INSERT INTO quotas_limits (QuotasID,Type,CounterLimit) VALUES(4, 'MessageCount', 125);
+  INSERT INTO quotas (PolicyID,Name,Track,Period,Verdict,Data) VALUES (6, 'Sender:user@domain','Sender:user@domain', ${CBPOLICYD_SENDER_PERIOD}, 'DEFER', '${TOO_MANY_EMAILS_MESSAGE}');
+  INSERT INTO quotas (PolicyID,Name,Track,Period,Verdict) VALUES (6, 'Recipient:user@domain', 'Recipient:user@domain', ${CBPOLICYD_RECIPIENT_PERIOD}, 'REJECT');
+  INSERT INTO quotas_limits (QuotasID,Type,CounterLimit) VALUES(3, 'MessageCount', ${CBPOLICYD_SENDER_MESSAGECOUNT});
+  INSERT INTO quotas_limits (QuotasID,Type,CounterLimit) VALUES(4, 'MessageCount', ${CBPOLICYD_RECIPIENT_MESSAGECOUNT});
 EOF
 
   echo "Setting basic quota policy"
