@@ -126,6 +126,64 @@ fi
 
 # TODO: Check that at this point all of the variables have some kind of data
 
+# Non empty db user
+if [ "x" = "x${CBPOLICYD_DB_USER}" ] ; then
+  echo "Empty --user"
+  echo "Aborting..."
+  exit 1
+fi
+
+# Non empty db hostname
+if [ "x" = "x${CBPOLICYD_DB_HOSTNAME}" ] ; then
+  echo "Empty --hostname"
+  echo "Aborting..."
+  exit 1
+fi
+
+# Non empty db port
+if [ "x" = "x${CBPOLICYD_DB_PORT}" ] ; then
+  echo "Empty --port"
+  echo "Aborting..."
+  exit 1
+fi
+
+# Non empty db password
+if [ "x" = "x${CBPOLICYD_DB_PASSWORD}" ] ; then
+  echo "Empty --password"
+  echo "Aborting..."
+  exit 1
+fi
+
+# Non empty sender period
+if [ "x" = "x${CBPOLICYD_SENDER_PERIOD}" ] ; then
+  echo "Empty --sender-period"
+  echo "Aborting..."
+  exit 1
+fi
+
+# Non empty sender messagecount
+if [ "x" = "x${CBPOLICYD_SENDER_MESSAGECOUNT}" ] ; then
+  echo "Empty --sender-messagecount"
+  echo "Aborting..."
+  exit 1
+fi
+
+# Non empty recipient period
+if [ "x" = "x${CBPOLICYD_RECIPIENT_PERIOD}" ] ; then
+  echo "Empty --recipient-period"
+  echo "Aborting..."
+  exit 1
+fi
+
+# Non empty recipient messagecount
+if [ "x" = "x${CBPOLICYD_RECIPIENT_MESSAGECOUNT}" ] ; then
+  echo "Empty --recipient-messagecount"
+  echo "Aborting..."
+  exit 1
+fi
+
+# MAIN PROGRAM
+
 if [ "x${SERVER_MODE}" = "xYES" ] ; then
 
   # creating a user, just to make sure we have one (for mysql on CentOS 6, so we can execute the next mysql queries w/o errors)
