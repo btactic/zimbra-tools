@@ -26,6 +26,7 @@ set -e
 
 MYSQL_CLI="/usr/bin/mysql"
 MYSQL_PORT="3306"
+TOO_MANY_EMAILS_MESSAGE="Esta mandando demasiados mensajes en muy poco tiempo. Pruebe mas tarde."
 
 echo "Automated cbpolicd installer for single-server. Tested on Zimbra 8.8.15 p7 CentOS7, Zimbra 9.0.0 p29 CentOS 7, Zimbra 9.0.0 patch 29 on Ubuntu 20, Zimbra 10 on Ubuntu 20.
 - Installs policyd on MariaDB or MySQL (shipped with Zimbra) and show commands on how to activate on Zimbra
@@ -103,7 +104,7 @@ POLICYDPOLICYSQL="$(mktemp /tmp/policyd-policy.XXXXXXXX.sql)"
 cat <<EOF > "${POLICYDPOLICYSQL}"
 INSERT INTO policies (ID, Name,Priority,Description) VALUES(6, 'Zimbra CBPolicyd Policies', 0, 'Zimbra CBPolicyd Policies');
 INSERT INTO policy_members (PolicyID,Source,Destination) VALUES(6, 'any', 'any');
-INSERT INTO quotas (PolicyID,Name,Track,Period,Verdict,Data) VALUES (6, 'Sender:user@domain','Sender:user@domain', 60, 'DEFER', 'You are sending too many emails, contact helpdesk');
+INSERT INTO quotas (PolicyID,Name,Track,Period,Verdict,Data) VALUES (6, 'Sender:user@domain','Sender:user@domain', 60, 'DEFER', '${TOO_MANY_EMAILS_MESSAGE}');
 INSERT INTO quotas (PolicyID,Name,Track,Period,Verdict) VALUES (6, 'Recipient:user@domain', 'Recipient:user@domain', 60, 'REJECT');
 INSERT INTO quotas_limits (QuotasID,Type,CounterLimit) VALUES(3, 'MessageCount', 100);
 INSERT INTO quotas_limits (QuotasID,Type,CounterLimit) VALUES(4, 'MessageCount', 125);
