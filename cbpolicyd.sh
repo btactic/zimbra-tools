@@ -185,7 +185,7 @@ if [ "x${CLIENT_MODE}" = "xYES" ] && [ "x" = "x${CBPOLICYD_DB_PASSWORD}" ] ; the
   exit 1
 fi
 
-# TODO: Check that at this point all of the variables have some kind of data
+# Check that at this point all of the variables have some kind of data
 
 # Non empty db user
 if [ "x" = "x${CBPOLICYD_DB_USER}" ] ; then
