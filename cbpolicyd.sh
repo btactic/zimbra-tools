@@ -348,7 +348,7 @@ Here are some tips:
 - You can run /usr/local/sbin/cbpolicyd-report
   to show message count by sender/day
 - You can change or review your polcies using mysql client:
-  "${MYSQL_CLI}" ${CBPOLICYD_DB_NAME}
+  ${MYSQL_CLI} ${CBPOLICYD_DB_NAME}
   SELECT * FROM quotas_limits;
   UPDATE quotas_limits SET CounterLimit = 30 WHERE ID = 4;
 
