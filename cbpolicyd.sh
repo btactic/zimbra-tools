@@ -359,8 +359,14 @@ CBPolicyd installed successful
 if [ "x${SERVER_MODE}" = "xYES" ] ; then
   echo "--------------------------------------------------------------------------------------------------------------
 The following policy is installed:
-- Rate limit any sender from sending more then 100 emails every 60 seconds. Messages beyond this limit are deferred.
-- Rate limit any @domain from receiving more then 125 emails in a 60 second period. Messages beyond this rate are rejected.
+- Rate limit any sender
+    from sending more than ${CBPOLICYD_SENDER_MESSAGECOUNT} emails
+    every ${CBPOLICYD_SENDER_PERIOD} seconds.
+    Messages beyond this limit are deferred.
+- Rate limit any @domain
+    from receiving more then ${CBPOLICYD_RECIPIENT_MESSAGECOUNT} emails
+    in a ${CBPOLICYD_RECIPIENT_PERIOD} second period.
+    Messages beyond this rate are rejected.
 
 For your reference:
 - Database ${CBPOLICYD_DB_NAME} and user have been created using:
