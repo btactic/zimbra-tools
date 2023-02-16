@@ -149,6 +149,8 @@ done
 if [ "x${SERVER_MODE}" = "xYES" ] && [ "x${CLIENT_MODE}" = "xYES" ] ; then
   echo "--client and --server cannot be used simultaneously."
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -158,6 +160,8 @@ if [ "x${SERVER_MODE}" = "xYES" ] || [ "x${CLIENT_MODE}" = "xYES" ] ; then
 else
   echo "Either --client or --server needs to be specified."
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -175,6 +179,8 @@ fi
 if [ "x${CLIENT_MODE}" = "xYES" ] && [ "x" = "x${CBPOLICYD_DB_HOSTNAME}" ] ; then
   echo "--client needs a non empty --hostname"
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -182,6 +188,8 @@ fi
 if [ "x${CLIENT_MODE}" = "xYES" ] && [ "x" = "x${CBPOLICYD_DB_PASSWORD}" ] ; then
   echo "--client needs a non empty --password"
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -191,6 +199,8 @@ fi
 if [ "x" = "x${CBPOLICYD_DB_USER}" ] ; then
   echo "Empty --user"
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -198,6 +208,8 @@ fi
 if [ "x" = "x${CBPOLICYD_DB_HOSTNAME}" ] ; then
   echo "Empty --hostname"
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -205,6 +217,8 @@ fi
 if [ "x" = "x${CBPOLICYD_DB_PORT}" ] ; then
   echo "Empty --port"
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -212,6 +226,8 @@ fi
 if [ "x" = "x${CBPOLICYD_DB_PASSWORD}" ] ; then
   echo "Empty --password"
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -219,6 +235,8 @@ fi
 if [ "x" = "x${CBPOLICYD_SENDER_PERIOD}" ] ; then
   echo "Empty --sender-period"
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -226,6 +244,8 @@ fi
 if [ "x" = "x${CBPOLICYD_SENDER_MESSAGECOUNT}" ] ; then
   echo "Empty --sender-messagecount"
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -233,6 +253,8 @@ fi
 if [ "x" = "x${CBPOLICYD_RECIPIENT_PERIOD}" ] ; then
   echo "Empty --recipient-period"
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
@@ -240,6 +262,8 @@ fi
 if [ "x" = "x${CBPOLICYD_RECIPIENT_MESSAGECOUNT}" ] ; then
   echo "Empty --recipient-messagecount"
   echo "Aborting..."
+  echo ""
+  usage
   exit 1
 fi
 
