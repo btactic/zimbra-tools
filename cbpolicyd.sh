@@ -172,7 +172,7 @@ fi
 
 # If password is empty at this point and we are in server mode we generate a random value
 if [ "x${SERVER_MODE}" = "xYES" ] && [ "x" = "x${CBPOLICYD_DB_PASSWORD}" ] ; then
-  CBPOLICYD_DB_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-10};echo;)
+  CBPOLICYD_DB_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 10;echo;)
 fi
 
 # Ensure that Client mode has a hostname
