@@ -86,6 +86,8 @@ cat <<EOF
 
 EOF
 
+}
+
 MYSQL_CLI="/usr/bin/mysql"
 TOO_MANY_EMAILS_MESSAGE="Esta mandando demasiados mensajes en muy poco tiempo. Pruebe mas tarde."
 
